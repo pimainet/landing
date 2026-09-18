@@ -4,26 +4,26 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[background-color,color,box-shadow,transform,opacity] duration-150 ease-out disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] active:not-disabled:scale-[0.96]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-[color,background-color,box-shadow,transform,opacity] duration-150 ease-out disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:not-disabled:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-forest-mid shadow-[var(--shadow-border)]",
-        inverse:
-          "bg-paper text-ink hover:bg-paper-2 shadow-[var(--shadow-border)]",
+        default:
+          "bg-fg text-bg shadow-sm hover:bg-fg/90",
+        accent:
+          "bg-accent text-accent-fg shadow-sm hover:bg-accent-hover",
         outline:
-          "border border-border bg-transparent hover:bg-muted text-foreground",
-        "outline-inverse":
-          "border border-paper/25 bg-transparent text-paper hover:bg-paper/8",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-muted text-foreground",
-        "ghost-inverse": "text-paper/80 hover:text-paper hover:bg-paper/8",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border border-border bg-surface text-fg hover:bg-bg-warm",
+        ghost: "text-fg hover:bg-surface-2/70",
+        console:
+          "bg-console-fg text-console hover:bg-console-fg/90",
+        link: "text-accent underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-11 rounded-md px-4",
-        sm: "h-9 rounded-sm px-3 text-xs",
+        default: "h-11 rounded-md px-5 text-sm",
+        sm: "h-9 rounded-sm px-3 text-sm",
         lg: "h-12 rounded-lg px-6 text-base",
+        xl: "h-14 rounded-lg px-7 text-base",
         icon: "size-11 rounded-md",
       },
     },
