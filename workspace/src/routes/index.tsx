@@ -81,12 +81,12 @@ const COMPARE = [
     ],
   },
   {
-    name: "Local Growth OS",
+    name: "SEO Maps cùng chúng tôi",
     featured: true,
     items: [
-      "Xem hiện trạng Maps trước khi bán gói",
-      "Việc tuần rõ, tiếng Việt — tập trung việc ra tín hiệu",
-      "Nhìn hạng và tín hiệu quanh cửa, không đoán",
+      "Xem hiện trạng trước — không bán gói mù",
+      "Việc tuần rõ, tập trung việc làm ra gọi / chỉ đường",
+      "Đo tín hiệu thật, không báo cáo “đã đăng X bài”",
     ],
   },
   {
@@ -193,17 +193,16 @@ function Home() {
                 </a>
               </Button>
               <Button size="xl" variant="outline" asChild>
-                <a href="#os">Xem bảng làm việc</a>
+                <a href="#goi">Xem gói SEO Maps</a>
               </Button>
             </div>
             <p className="rise-in rise-in-delay-4 mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
               <span className="inline-flex items-center gap-1.5">
-                <Timer className="size-3.5" /> 3 phút
+                <Timer className="size-3.5" /> 3 phút · miễn phí
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck className="size-3.5" /> Miễn phí
+                <ShieldCheck className="size-3.5" /> Không ép mua · Không ký gì trên trang
               </span>
-              <span>Không bị gọi bán hàng</span>
             </p>
           </div>
           <div className="rise-in rise-in-delay-2">
@@ -436,18 +435,33 @@ function Home() {
                 <li>· Việc ưu tiên theo tuần</li>
                 <li>· Theo dõi tín hiệu cơ bản</li>
               </ul>
+              <a
+                href="#chan-doan"
+                className="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 text-sm font-medium hover:border-fg/40"
+              >
+                Bắt đầu từ chẩn đoán
+              </a>
             </article>
-            <article className="flex flex-col rounded-2xl bg-fg p-6 text-bg shadow-[var(--shadow-lift)] md:p-7">
-              <p className="text-xs text-bg/60">Tăng trưởng · phổ biến</p>
+            <article className="relative flex flex-col rounded-2xl bg-fg p-6 text-bg shadow-[var(--shadow-lift)] md:p-7">
+              <span className="absolute -top-3 right-4 rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-bg">
+                Chọn nhiều nhất
+              </span>
+              <p className="text-xs text-bg/60">Tăng trưởng · hợp đa số cửa hàng</p>
               <p className="mt-2 font-display text-2xl tracking-tight">3.500.000đ<span className="text-base text-bg/60">/tháng</span></p>
               <p className="mt-3 text-sm leading-relaxed text-bg/75">
-                Muốn Maps thành nguồn khách ổn định, đọc được gọi / chỉ đường hàng tháng.
+                Muốn Maps thành nguồn khách ổn định, đọc được gọi / chỉ đường hàng tháng — không cần ôm multi-location ngay.
               </p>
               <ul className="mt-5 flex-1 space-y-2 text-sm text-bg/80">
                 <li>· SEO Maps đầy đủ như kênh bán hàng</li>
                 <li>· Theo dõi tín hiệu gọi / chỉ đường</li>
                 <li>· Facebook bổ sung nếu cần (không bắt buộc)</li>
               </ul>
+              <a
+                href="#chan-doan"
+                className="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg bg-bg px-4 text-sm font-medium text-fg"
+              >
+                Chẩn đoán rồi chọn gói này
+              </a>
             </article>
             <article className="flex flex-col rounded-2xl bg-surface p-6 shadow-[var(--shadow-border)] md:p-7">
               <p className="text-xs text-muted">Thống trị</p>
@@ -460,18 +474,25 @@ function Home() {
                 <li>· Multi-location khi cần</li>
                 <li>· Có người đọc số và chỉnh hướng</li>
               </ul>
+              <a
+                href="#chan-doan"
+                className="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 text-sm font-medium hover:border-fg/40"
+              >
+                Bắt đầu từ chẩn đoán
+              </a>
             </article>
           </div>
           <p className="mt-8 text-center text-sm text-muted">
-            Ký mới trong tuần: tặng audit chỉ ra chỗ mất khách + hướng 30 ngày ưu tiên · 30 ngày đầu không rõ hướng — hoàn tháng đầu
+            Ký mới trong tuần: tặng audit chỗ mất khách + hướng 30 ngày · 30 ngày đầu không rõ hướng — hoàn tháng đầu · Hủy bất kỳ lúc nào
           </p>
-          <div className="mt-6 flex justify-center">
+          <div className="mt-6 flex flex-col items-center gap-2">
             <Button size="xl" asChild>
               <a href="#chan-doan">
-                Bắt đầu bằng xem Maps của tôi
+                Xem Maps miễn phí trước — rồi mới quyết gói
                 <ArrowRight className="size-4" />
               </a>
             </Button>
+            <p className="text-xs text-muted">Không cần thẻ · Không ký trên trang này</p>
           </div>
         </div>
       </section>
@@ -505,17 +526,19 @@ function Home() {
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted">
             Ba phút xem hiện trạng. Trong 24 giờ nhận 3 việc nên làm trước trên Maps.
-            Rồi mới quyết có làm SEO Maps cùng chúng tôi hay tự làm.
+            Rồi mới quyết — tự làm hoặc làm cùng gói SEO Maps.
           </p>
           <div className="mt-8 flex justify-center">
             <Button size="xl" asChild>
               <a href="#chan-doan">
-                Xem Maps của tôi
+                Xem Maps của tôi — miễn phí
                 <ArrowRight className="size-4" />
               </a>
             </Button>
           </div>
-          <p className="mt-4 text-sm text-muted">Miễn phí · Không bị gọi bán hàng · Trả lời qua Zalo</p>
+          <p className="mt-4 text-sm text-muted">
+            Không ép mua · Không ký trên trang · Một tin Zalo trong 24 giờ · Bạn bảo dừng là dừng
+          </p>
         </div>
       </section>
 

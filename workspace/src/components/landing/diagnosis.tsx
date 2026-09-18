@@ -75,7 +75,7 @@ type FormState = {
 
 const EMPTY: FormState = {
   industry: "",
-  city: "",
+  city: "Thanh Hóa",
   status: "",
   business: "",
   mapsUrl: "",
@@ -178,18 +178,19 @@ export function Diagnosis() {
             Xem Google Maps của bạn trước khi đổ thêm tiền quảng cáo.
           </h2>
           <p className="mt-5 max-w-md text-base leading-relaxed text-muted">
-            Vài câu hỏi ngắn. Bạn thấy điểm hồ sơ ngay trên trang.
-            Trong 24 giờ, tin Zalo gửi 3 việc nên làm trước — không ép mua gói.
+            Chúng tôi gửi giá trị trước: vài câu hỏi, điểm sơ bộ ngay trên trang, rồi 3 việc
+            nên làm qua Zalo trong 24 giờ. Bạn chưa phải trả gì — và chưa bị ép mua gói.
           </p>
           <ul className="mt-8 space-y-3 text-sm text-muted">
             {[
-              "Miễn phí",
-              "Không bị ép mua gói",
+              "Miễn phí · không cần thẻ",
+              "Không ép mua gói sau khi gửi",
               "Bạn bảo dừng là dừng",
-            ].map((t) => (
-              <li key={t} className="flex items-start gap-2">
+              "Có link Maps thì chẩn đoán sát hơn (không bắt buộc)",
+            ].map((line) => (
+              <li key={line} className="flex items-start gap-2">
                 <Check className="mt-0.5 size-4 shrink-0 text-accent" />
-                {t}
+                {line}
               </li>
             ))}
           </ul>
@@ -210,7 +211,7 @@ export function Diagnosis() {
           {step === 0 && (
             <div>
               <h3 className="font-display text-2xl tracking-tight">Bạn đang làm ngành nào?</h3>
-              <p className="mt-2 text-sm text-muted">Chọn gần đúng là được.</p>
+              <p className="mt-2 text-sm text-muted">Chọn gần đúng là được — chưa cần tên cửa hàng.</p>
               <div className="mt-6 grid grid-cols-2 gap-2">
                 {INDUSTRIES.map((ind) => (
                   <button
@@ -326,9 +327,9 @@ export function Diagnosis() {
 
           {step === 2 && (
             <div>
-              <h3 className="font-display text-2xl tracking-tight">Nhận kết quả qua Zalo</h3>
+              <h3 className="font-display text-2xl tracking-tight">Nhận 3 việc nên làm qua Zalo</h3>
               <p className="mt-2 text-sm text-muted">
-                Một tin trong 24 giờ. Bạn bảo dừng là dừng.
+                Một tin trong 24 giờ. Không gọi ban đêm. Bạn bảo dừng là dừng.
               </p>
               <div className="mt-6 space-y-4">
                 <div>
@@ -364,13 +365,18 @@ export function Diagnosis() {
                   Xem Maps của tôi <ArrowRight className="size-4" />
                 </Button>
               </div>
+              <p className="mt-4 text-center text-xs text-muted">
+                Miễn phí · Không ký hợp đồng trên trang · Không chia sẻ số cho bên thứ ba
+              </p>
             </div>
           )}
 
           {step === 3 && !done && (
             <div className="py-6">
               <h3 className="font-display text-2xl tracking-tight">Đang xem hộ bạn</h3>
-              <p className="mt-2 text-sm text-muted">Khoảng 15 giây. Không phải form bỏ quên.</p>
+              <p className="mt-2 text-sm text-muted">
+                Khoảng 15 giây — đang đối chiếu tình trạng bạn chọn với khung SEO Maps.
+              </p>
               <ul className="mt-8 space-y-3">
                 {LABOR.map((line, i) => (
                   <li key={line} className="flex items-center gap-3 text-sm">
