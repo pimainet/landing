@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/demo",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Local Growth OS",
+      "hasCanvas": false,
+      "bodyTextLen": 1930,
+      "bodyTextHash": "5f9378450887de18de36e643763bd36d8c7ff4f2a20c7af03d65c550cb4d0ce7",
+      "bodyTextPrefix": "Bỏ qua đến nội dung Local Growth OS Vấn đề Quy trình Demo audit ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/demo-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Local Growth OS",
+      "hasCanvas": false,
+      "bodyTextLen": 1876,
+      "bodyTextHash": "9b37adbc87f57e91881195dca46015014b8b2828ddbefa3b10bf54c0bd937470",
+      "bodyTextPrefix": "Bỏ qua đến nội dung Local Growth OS Về trang chủ Demo audit mẫu ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/demo-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/demo-preview.json"
+}
