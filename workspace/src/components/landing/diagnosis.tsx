@@ -18,6 +18,7 @@ const INDUSTRIES = [
 ] as const;
 
 const CITIES = [
+  "Thanh Hóa",
   "Hà Nội",
   "TP. Hồ Chí Minh",
   "Đà Nẵng",
@@ -31,34 +32,34 @@ const CITIES = [
 const STATUSES = [
   {
     id: "none",
-    label: "Chưa có hồ sơ trên Google",
+    label: "Chưa có hồ sơ trên Google Maps",
     score: 18,
-    note: "Google gần như chưa biết cửa hàng bạn tồn tại trên bản đồ.",
+    note: "Google gần như chưa biết cửa hàng bạn trên bản đồ — khách tìm gần đây khó thấy bạn.",
   },
   {
     id: "buried",
-    label: "Có hồ sơ nhưng không vào Top 3",
+    label: "Có hồ sơ nhưng ít ai gọi / chỉ đường",
     score: 34,
-    note: "Hồ sơ đã có, nhưng đối thủ đang được Google đẩy lên trước.",
+    note: "Hồ sơ đã có, nhưng khách vẫn đang bấm chỗ khác trước. Cần xem chỗ nào đang chặn tín hiệu.",
   },
   {
     id: "unstable",
-    label: "Đã lên top rồi lại tụt",
+    label: "Có lúc lên, có lúc tụt — không giữ được",
     score: 58,
-    note: "Nền đã có. Thiếu việc làm đều nên hạng không giữ được.",
+    note: "Nền đã có. Cần hướng rõ và theo dõi tín hiệu, không chỉ đăng thêm cho có.",
   },
   {
     id: "unknown",
-    label: "Không rõ đang đứng ở đâu",
+    label: "Không rõ đang đứng ở đâu trên Maps",
     score: 28,
-    note: "Chưa đo thì khó sửa. Đây là chỗ nhiều chủ quán bị kẹt.",
+    note: "Chưa xem hiện trạng thì khó biết việc nào đáng làm trước.",
   },
 ] as const;
 
 const LABOR = [
-  "Đang xem hồ sơ Google của bạn",
-  "So với cửa hàng trong vòng 2 km",
-  "Xem bạn đang thiếu chỗ nào trên Maps",
+  "Đang xem hồ sơ Google Maps của bạn",
+  "Đối chiếu với cửa hàng quanh khu vực",
+  "Tìm chỗ đang làm giảm gọi / chỉ đường",
   "Chọn 3 việc nên làm trước",
 ];
 
@@ -67,6 +68,7 @@ type FormState = {
   city: string;
   status: string;
   business: string;
+  mapsUrl: string;
   name: string;
   phone: string;
 };
@@ -76,6 +78,7 @@ const EMPTY: FormState = {
   city: "",
   status: "",
   business: "",
+  mapsUrl: "",
   name: "",
   phone: "",
 };
@@ -123,7 +126,7 @@ export function Diagnosis() {
 
   function nextFromStep1() {
     if (!form.city || !form.status) {
-      setError("Chọn thành phố và tình trạng Maps.");
+      setError("Chọn tỉnh/thành và tình trạng Maps hiện tại.");
       return;
     }
     setStep(2);
@@ -172,11 +175,11 @@ export function Diagnosis() {
             Bắt đầu từ đây
           </p>
           <h2 className="mt-4 font-display text-3xl tracking-tight md:text-5xl">
-            Xem Maps của bạn trước khi đổ thêm tiền quảng cáo.
+            Xem Google Maps của bạn trước khi đổ thêm tiền quảng cáo.
           </h2>
           <p className="mt-5 max-w-md text-base leading-relaxed text-muted">
-            Ba câu hỏi. Không bị gọi bán hàng. Bạn thấy điểm hồ sơ ngay trên trang.
-            Trong 24 giờ, tin Zalo gửi 3 việc nên làm trước.
+            Vài câu hỏi ngắn. Bạn thấy điểm hồ sơ ngay trên trang.
+            Trong 24 giờ, tin Zalo gửi 3 việc nên làm trước — không ép mua gói.
           </p>
           <ul className="mt-8 space-y-3 text-sm text-muted">
             {[
@@ -245,13 +248,31 @@ export function Diagnosis() {
                   <Input
                     id="biz"
                     className="mt-2"
-                    placeholder="Ví dụ: Hoa Spa Đa Kao"
+                    placeholder="Ví dụ: Hoa Spa Thanh Hóa"
                     value={form.business}
                     onChange={(e) => patch({ business: e.target.value })}
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Thành phố</p>
+                  <Label htmlFor="maps">
+                    Link Google Maps / Google Business{" "}
+                    <span className="font-normal text-muted">(nếu có)</span>
+                  </Label>
+                  <Input
+                    id="maps"
+                    className="mt-2"
+                    type="url"
+                    placeholder="https://maps.google.com/... hoặc dán link chia sẻ Maps"
+                    value={form.mapsUrl}
+                    onChange={(e) => patch({ mapsUrl: e.target.value })}
+                    autoComplete="url"
+                  />
+                  <p className="mt-1.5 text-xs text-muted">
+                    Có link giúp chẩn đoán đúng hồ sơ của bạn. Chưa có cũng làm tiếp được.
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Tỉnh / thành phố</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {CITIES.map((c) => (
                       <button
@@ -373,35 +394,45 @@ export function Diagnosis() {
           {done && (
             <div>
               <h3 className="font-display text-2xl tracking-tight">
-                Bạn vừa xem thẳng Maps — việc nhiều chủ quán cứ để đó.
+                Đã ghi nhận — đây là hướng sơ bộ
               </h3>
+              <p className="mt-2 text-sm text-muted">
+                Điểm dưới dựa trên tình trạng bạn chọn, chưa thay audit tay trên hồ sơ thật.
+                {form.mapsUrl
+                  ? " Vì đã có link Maps, tin Zalo sẽ bám đúng hồ sơ hơn."
+                  : " Nếu bổ sung link Maps sau, chẩn đoán sẽ sát hơn."}
+              </p>
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <div className="rounded-xl bg-bg p-4">
-                  <p className="text-xs text-muted">Điểm hồ sơ</p>
+                  <p className="text-xs text-muted">Mức ước lượng</p>
                   <p className="mt-2 font-display text-4xl tabular-nums">{health}</p>
-                  <p className="mt-1 text-xs text-muted">trên 100 · sơ bộ</p>
+                  <p className="mt-1 text-xs text-muted">/100 · chưa phải audit đầy đủ</p>
                 </div>
                 <div className="rounded-xl bg-bg p-4">
-                  <p className="text-xs text-muted">Nên làm trước</p>
+                  <p className="text-xs text-muted">Đọc nhanh</p>
                   <p className="mt-2 text-sm leading-relaxed">{statusMeta?.note}</p>
                 </div>
               </div>
-              <p className="mt-5 text-sm leading-relaxed text-muted">
+              <div className="mt-5 rounded-xl border border-border bg-bg p-4">
+                <p className="text-xs font-medium text-muted">Bước tiếp theo (trong 24 giờ)</p>
+                <ol className="mt-3 list-decimal space-y-2 pl-4 text-sm leading-relaxed">
+                  <li>Tin Zalo vào số {normalizePhone(form.phone)} — 3 việc nên làm trước trên Maps</li>
+                  <li>Nếu bạn muốn, mình xem giúp link hồ sơ và nói rõ chỗ đang chặn gọi / chỉ đường</li>
+                  <li>Bạn tự làm, hoặc làm cùng gói SEO Maps — không ép</li>
+                </ol>
+              </div>
+              <p className="mt-4 text-sm leading-relaxed text-muted">
                 {industryLabel ? `${industryLabel} · ` : ""}
                 {form.city}
-                {form.business ? ` · ${form.business}` : ""}. Tin Zalo gửi 3 việc nên làm trước,
-                vào số {normalizePhone(form.phone)}.
+                {form.business ? ` · ${form.business}` : ""}
+                {form.mapsUrl ? " · đã gắn link Maps" : ""}.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button size="lg" asChild>
-                  <a href="https://maps.bgs.com.vn" target="_blank" rel="noreferrer">
-                    Mở Local Growth OS
-                  </a>
+                  <a href="#faq">Xem câu hỏi thường gặp</a>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <a href="https://www.bgs.com.vn" target="_blank" rel="noreferrer">
-                    Xem BGS là gì
-                  </a>
+                <Button size="lg" variant="outline" onClick={() => { setDone(false); setStep(0); setForm(EMPTY); setLaborIndex(0); }}>
+                  Làm lại cho cửa khác
                 </Button>
               </div>
             </div>

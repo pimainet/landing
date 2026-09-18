@@ -16,6 +16,9 @@ export function SiteNav() {
           <a href="#cach-lam" className="hover:text-fg">
             Cách làm
           </a>
+          <a href="#goi" className="hover:text-fg">
+            Gói SEO Maps
+          </a>
           <a href="#chan-doan" className="hover:text-fg">
             Xem Maps
           </a>

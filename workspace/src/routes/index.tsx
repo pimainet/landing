@@ -33,18 +33,18 @@ const STATS = [
 const PAINS = [
   {
     icon: Megaphone,
-    title: "Bạn trả ads. Đối thủ ngồi trên Maps hốt khách.",
-    body: "Khách tìm rồi mở bản đồ. Họ bấm cửa hàng Top 3 — thường không phải bạn. Tiền quảng cáo đang nuôi hàng xóm.",
+    title: "Bạn trả ads — đối thủ trên Maps lại hốt khách.",
+    body: "Khách tìm xong mở bản đồ, bấm Top 3. Thường không phải bạn. Tiền quảng cáo đang nuôi quán bên cạnh.",
   },
   {
     icon: Eye,
-    title: "Hồ sơ để im, Google tưởng bạn nghỉ.",
-    body: "Không đăng bài, không ảnh mới, không trả lời đánh giá. Google đọc sự im lặng như cửa đã đóng.",
+    title: "Đã có hồ sơ Maps, vẫn ít người gọi.",
+    body: "Chỉnh rồi, đăng rồi mà tín hiệu gọi / chỉ đường vẫn yếu. Vấn đề không chỉ là “có bài”, mà Maps chưa mang khách.",
   },
   {
     icon: MapPinned,
-    title: "Khách đứng cách vài phút. Không thấy tên bạn.",
-    body: "Không phải thiếu sản phẩm. Thiếu chỗ trên 3 vị trí họ nhìn trước khi bước vào cửa.",
+    title: "Khách đứng gần cửa — không thấy tên bạn.",
+    body: "Không phải thiếu sản phẩm. Thiếu chỗ trong 3 tên họ nhìn trước khi chọn chỗ ghé.",
   },
 ];
 
@@ -52,22 +52,22 @@ const STEPS = [
   {
     n: "01",
     title: "Xem đang đứng đâu",
-    body: "Trước khi bán gói gì. Đọc hồ sơ, đối thủ quanh bạn, chỗ trống trên Maps — rồi mới nói cần làm gì.",
+    body: "Trước khi bán gói gì: đọc hồ sơ, đối thủ quanh bạn, chỗ đang làm giảm gọi / chỉ đường — rồi mới nói cần làm gì.",
   },
   {
     n: "02",
-    title: "Chỉ 3 việc trước",
-    body: "Không làm 20 thứ một lúc. Chọn việc dễ làm, Google nhìn thấy rõ.",
+    title: "Chỉ vài việc đáng làm trước",
+    body: "Không làm 20 thứ một lúc. Chọn việc Google và khách thật sự phản ứng.",
   },
   {
     n: "03",
-    title: "Làm đều mỗi tuần",
-    body: "Đăng bài, thêm ảnh, trả lời đánh giá, khớp tên–địa chỉ–SĐT. Có việc nhắc, hồ sơ không bị bỏ quên.",
+    title: "Làm đúng việc, có theo dõi",
+    body: "Chỉnh hồ sơ, nội dung, đánh giá theo hướng ra tín hiệu — không đăng cho đủ số. Có việc nhắc từng tuần.",
   },
   {
     n: "04",
-    title: "Giữ Top 3",
-    body: "Cuối tuần nhận báo cáo: lên hay tụt, tuần sau làm gì.",
+    title: "Giữ và đọc tín hiệu",
+    body: "Cuối tuần xem: gọi / chỉ đường / hạng quanh cửa — tuần sau làm gì tiếp.",
   },
 ];
 
@@ -84,9 +84,9 @@ const COMPARE = [
     name: "Local Growth OS",
     featured: true,
     items: [
-      "Xem hiện trạng trước khi bán",
-      "Việc tuần viết sẵn, tiếng Việt",
-      "Nhìn hạng quanh cửa hàng, không đoán",
+      "Xem hiện trạng Maps trước khi bán gói",
+      "Việc tuần rõ, tiếng Việt — tập trung việc ra tín hiệu",
+      "Nhìn hạng và tín hiệu quanh cửa, không đoán",
     ],
   },
   {
@@ -107,7 +107,7 @@ const INDUSTRIES = [
   "Gara, rửa xe, phụ tùng",
   "Cửa hàng bán lẻ, thời trang",
   "Trung tâm, lớp học",
-  "Mọi dịch vụ khách tìm “gần tôi”",
+  "Mọi dịch vụ khách tìm “gần tôi” — kể cả tại Thanh Hóa",
 ];
 
 const FAQS = [
@@ -116,12 +116,12 @@ const FAQS = [
     a: "Được. Google xếp Maps chủ yếu dựa trên hồ sơ Google Business, đánh giá, và khoảng cách. Có website thì tốt thêm. Không có vẫn làm được.",
   },
   {
-    q: "Bao lâu thì vào Top 3?",
-    a: "Nơi ít đối thủ: vài tuần đã thấy tín hiệu. Chỗ đông như spa, nha khoa, quán trung tâm: thường 1,5–3 tháng làm đều. Không phải chỉnh một lần là xong.",
+    q: "Bao lâu thì thấy tín hiệu trên Maps?",
+    a: "Nơi ít đối thủ: vài tuần có thể thấy gọi / chỉ đường nhúc nhích. Chỗ đông (spa, nha khoa, quán trung tâm): thường 1,5–3 tháng làm đúng hướng. Không hứa top sau một lần chỉnh.",
   },
   {
     q: "Khác thuê bên SEO Maps chỗ nào?",
-    a: "Không bắt đầu bằng gói dịch vụ. Bạn thấy cửa hàng đang đứng đâu, việc tuần này, hạng lên hay xuống. Không mua một thứ không nhìn được.",
+    a: "Không bắt đầu bằng gói dịch vụ mù. Bạn thấy cửa hàng đang đứng đâu, việc đáng làm trước, tín hiệu gọi / chỉ đường thế nào. Không mua thứ không nhìn được.",
   },
   {
     q: "Tôi có cần rành kỹ thuật không?",
@@ -181,9 +181,9 @@ function Home() {
               <span className="text-accent">Google Maps lại chỉ họ sang chỗ khác.</span>
             </h1>
             <p className="rise-in rise-in-delay-2 mt-6 max-w-xl text-lg leading-relaxed text-muted">
-              Local Growth OS giúp cửa hàng nhỏ lên Top 3 Google Maps — chỗ khách bấm
-              gọi và chỉ đường — rồi giữ vị trí đó. Không cần thuê bên ngoài, không cần
-              tự mày mò.
+              SEO Google Maps giúp cửa hàng nhỏ được khách tìm thấy đúng lúc họ cần —
+              bấm gọi, chỉ đường — rồi giữ được tín hiệu đó. Không bắt đầu bằng đống bài
+              đăng. Bắt đầu bằng xem Maps đang chặn khách chỗ nào.
             </p>
             <div className="rise-in rise-in-delay-3 mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button size="xl" asChild>
@@ -256,12 +256,14 @@ function Home() {
               Khách không ngồi đọc. Họ muốn tới ngay.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-muted">
-              Người gõ “spa gần tôi” hay “nha khoa quận 3” nhìn 3 cái tên, số sao, nút
-              gọi — rồi chọn. Không thấy bạn thì website đẹp cũng không được mở.
+              Người gõ “spa gần tôi”, “nha khoa Thanh Hóa” hay tên dịch vụ + khu vực
+              nhìn vài cái tên, số sao, nút gọi — rồi chọn. Không thấy bạn thì website
+              đẹp cũng ít được mở.
             </p>
             <p className="mt-4 text-base leading-relaxed text-muted">
-              Một khách spa 800 nghìn. Mười cuộc gọi một tuần từ Maps — đó là tiền đang
-              chảy sang quán bên cạnh, trong lúc bạn tăng ngân sách quảng cáo.
+              Một khách spa vài trăm nghìn đến cả triệu. Chỉ cần thêm vài cuộc gọi mỗi
+              tuần từ Maps — đó là doanh thu đang chảy sang quán bên cạnh, trong lúc bạn
+              tăng ngân sách quảng cáo.
             </p>
           </div>
           <blockquote className="rounded-2xl bg-fg p-8 text-bg md:p-10">
@@ -286,8 +288,8 @@ function Home() {
               Một màn hình. Việc tuần đã xếp sẵn.
             </h2>
             <p className="max-w-sm text-sm leading-relaxed text-console-muted">
-              Điểm hồ sơ, hạng quanh cửa hàng, việc phải làm — cùng một chỗ. Làm Maps
-              như chấm công ca, không phải “nhờ đăng giúp một bài”.
+              Điểm hồ sơ, hạng quanh cửa, việc đáng làm — cùng một chỗ. Làm SEO Maps
+              có hướng và có theo dõi, không phải nhờ đăng giúp cho có.
             </p>
           </div>
           <div className="mt-12">
@@ -351,7 +353,7 @@ function Home() {
         <div className="absolute inset-0 bg-console/80" />
         <div className="relative mx-auto max-w-6xl px-5 py-24 md:py-32">
           <h2 className="max-w-3xl font-display text-3xl tracking-tight text-console-fg md:text-5xl">
-            Từ phố cổ đến hẻm Sài Gòn — khách mở Maps trước khi bước vào cửa.
+            Từ Thanh Hóa đến Sài Gòn — khách mở Maps trước khi bước vào cửa.
           </h2>
           <ul className="mt-10 grid gap-3 sm:grid-cols-2">
             {INDUSTRIES.map((i) => (
@@ -366,7 +368,116 @@ function Home() {
         </div>
       </section>
 
+
+      <section id="tin-tuong" className="scroll-mt-24 border-t border-border py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-5">
+          <p className="text-xs font-medium uppercase tracking-widest text-accent">
+            Vì sao người ta chốt
+          </p>
+          <h2 className="mt-4 max-w-3xl font-display text-3xl tracking-tight md:text-5xl">
+            Không hứa top 1. Hứa hướng rõ và tín hiệu có thể theo dõi.
+          </h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <article className="rounded-2xl bg-surface p-6 shadow-[var(--shadow-border)]">
+              <p className="text-xs text-muted">Trước khi làm</p>
+              <p className="mt-3 font-display text-xl tracking-tight">
+                Xem Maps đang chặn khách chỗ nào
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                Không bán gói mù. Bạn thấy hiện trạng và vài việc đáng làm trước — rồi mới
+                quyết có làm tiếp hay không.
+              </p>
+            </article>
+            <article className="rounded-2xl bg-surface p-6 shadow-[var(--shadow-border)]">
+              <p className="text-xs text-muted">Khi làm SEO Maps</p>
+              <p className="mt-3 font-display text-xl tracking-tight">
+                Đo gọi điện, chỉ đường — không chỉ “đã đăng”
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                Báo cáo theo tín hiệu khách, không theo số bài. Đều mà không ra khách thì
+                không cần đều thêm.
+              </p>
+            </article>
+            <article className="rounded-2xl bg-surface p-6 shadow-[var(--shadow-border)]">
+              <p className="text-xs text-muted">An toàn tháng đầu</p>
+              <p className="mt-3 font-display text-xl tracking-tight">
+                30 ngày không thấy hướng đi rõ — hoàn tháng đầu
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                Không khóa hợp đồng dài. Tập trung thị trường local (trong đó có Thanh Hóa)
+                để làm sát địa bàn, không làm lan man cả nước.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="goi" className="scroll-mt-24 border-t border-border bg-bg-warm/40 py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-5">
+          <p className="text-xs font-medium uppercase tracking-widest text-accent">
+            Nếu làm cùng chúng tôi
+          </p>
+          <h2 className="mt-4 max-w-3xl font-display text-3xl tracking-tight md:text-5xl">
+            3 mức SEO Maps — chọn theo mức độ bạn muốn ôm
+          </h2>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
+            Sản phẩm chính là SEO Google Maps. Facebook và website chỉ bổ trợ khi cần.
+            Chưa có website vẫn làm được.
+          </p>
+          <div className="mt-12 grid gap-4 lg:grid-cols-3">
+            <article className="flex flex-col rounded-2xl bg-surface p-6 shadow-[var(--shadow-border)] md:p-7">
+              <p className="text-xs text-muted">Khởi động</p>
+              <p className="mt-2 font-display text-2xl tracking-tight">1.800.000đ<span className="text-base text-muted">/tháng</span></p>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                Đã có Maps nhưng ít gọi / chỉ đường. Rà đúng bệnh, chỉnh hướng, xem tín hiệu có nhúc nhích.
+              </p>
+              <ul className="mt-5 flex-1 space-y-2 text-sm text-muted">
+                <li>· Audit chỗ đang chặn khách trên Maps</li>
+                <li>· Việc ưu tiên theo tuần</li>
+                <li>· Theo dõi tín hiệu cơ bản</li>
+              </ul>
+            </article>
+            <article className="flex flex-col rounded-2xl bg-fg p-6 text-bg shadow-[var(--shadow-lift)] md:p-7">
+              <p className="text-xs text-bg/60">Tăng trưởng · phổ biến</p>
+              <p className="mt-2 font-display text-2xl tracking-tight">3.500.000đ<span className="text-base text-bg/60">/tháng</span></p>
+              <p className="mt-3 text-sm leading-relaxed text-bg/75">
+                Muốn Maps thành nguồn khách ổn định, đọc được gọi / chỉ đường hàng tháng.
+              </p>
+              <ul className="mt-5 flex-1 space-y-2 text-sm text-bg/80">
+                <li>· SEO Maps đầy đủ như kênh bán hàng</li>
+                <li>· Theo dõi tín hiệu gọi / chỉ đường</li>
+                <li>· Facebook bổ sung nếu cần (không bắt buộc)</li>
+              </ul>
+            </article>
+            <article className="flex flex-col rounded-2xl bg-surface p-6 shadow-[var(--shadow-border)] md:p-7">
+              <p className="text-xs text-muted">Thống trị</p>
+              <p className="mt-2 font-display text-2xl tracking-tight">6.500.000đ<span className="text-base text-muted">/tháng</span></p>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                Ôm khu vực, nhiều điểm bán, hoặc cần người theo sát số liệu liên tục.
+              </p>
+              <ul className="mt-5 flex-1 space-y-2 text-sm text-muted">
+                <li>· SEO Maps sâu + báo cáo khu vực</li>
+                <li>· Multi-location khi cần</li>
+                <li>· Có người đọc số và chỉnh hướng</li>
+              </ul>
+            </article>
+          </div>
+          <p className="mt-8 text-center text-sm text-muted">
+            Ký mới trong tuần: tặng audit chỉ ra chỗ mất khách + hướng 30 ngày ưu tiên · 30 ngày đầu không rõ hướng — hoàn tháng đầu
+          </p>
+          <div className="mt-6 flex justify-center">
+            <Button size="xl" asChild>
+              <a href="#chan-doan">
+                Bắt đầu bằng xem Maps của tôi
+                <ArrowRight className="size-4" />
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       <Diagnosis />
+
 
       <section id="faq" className="border-t border-border py-20 md:py-28">
         <div className="mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
@@ -390,11 +501,11 @@ function Home() {
       <section className="border-t border-border bg-bg-warm/60 py-20 md:py-24">
         <div className="mx-auto max-w-3xl px-5 text-center">
           <h2 className="font-display text-3xl tracking-tight md:text-5xl">
-            Đừng tăng tiền quảng cáo khi Maps còn để trống.
+            Đừng tăng tiền quảng cáo khi Maps còn chưa mang khách.
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted">
-            Một lần xem hiện trạng. Ba việc nên làm trước. Rồi hãy quyết định có mở
-            Local Growth OS hay không.
+            Ba phút xem hiện trạng. Trong 24 giờ nhận 3 việc nên làm trước trên Maps.
+            Rồi mới quyết có làm SEO Maps cùng chúng tôi hay tự làm.
           </p>
           <div className="mt-8 flex justify-center">
             <Button size="xl" asChild>
