@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { buildDemoAudit, type DemoAudit } from "@/lib/demo-audit";
-import { appLeadsUrl } from "@/lib/app-origin";
+import type { DemoAudit } from "@/lib/demo-audit";
+import { appDemoAuditUrl } from "@/lib/app-origin";
 import { ProductAuditFrame } from "@/components/landing/product-audit-frame";
 
 const INDUSTRIES = [
@@ -60,10 +60,10 @@ const STATUSES = [
 ] as const;
 
 const LABOR = [
-  "Đang xem hồ sơ Google Maps của bạn",
-  "Đối chiếu với cửa hàng quanh khu vực",
-  "Tìm chỗ đang làm giảm gọi / chỉ đường",
-  "Chọn 3 việc nên làm trước",
+  "Đang mở hồ sơ Google Maps công khai",
+  "Đọc điểm, đánh giá, ảnh, bài đăng",
+  "Chạy audit trên dữ liệu vừa lấy",
+  "Lọc phần đủ để bạn quyết định",
 ];
 
 type FormState = {
@@ -132,6 +132,10 @@ export function Diagnosis() {
       setError("Chọn tỉnh/thành và tình trạng Maps hiện tại.");
       return;
     }
+    if (!form.business.trim() && !form.mapsUrl.trim()) {
+      setError("Cần tên cửa hàng hoặc link Google Maps — không đoán hồ sơ.");
+      return;
+    }
     setStep(2);
   }
 
@@ -147,18 +151,14 @@ export function Diagnosis() {
     }
     setStep(3);
     setLaborIndex(0);
-    const nextAudit = buildDemoAudit({
-      ...form,
-      phone,
-      industryLabel,
-    });
-    setAudit(nextAudit);
+    setDone(false);
+    setAudit(null);
     const lead = {
       ...form,
       phone,
+      industryLabel,
       at: new Date().toISOString(),
-      overall: nextAudit.overall,
-      source: "landing-demo",
+      source: "landing-demo-live",
     };
     try {
       const prev = JSON.parse(localStorage.getItem("lgos-leads") ?? "[]") as unknown[];
@@ -166,28 +166,37 @@ export function Diagnosis() {
     } catch {
       /* ignore quota */
     }
-    void fetch(appLeadsUrl(), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(lead),
-    })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data?.audit) setAudit(data.audit);
-      })
-      .catch(() => {
-        /* OS chưa bật API công khai — dùng bản demo local */
-      });
 
     let i = 0;
     const timer = window.setInterval(() => {
       i += 1;
-      setLaborIndex(i);
-      if (i >= LABOR.length) {
+      setLaborIndex((n) => Math.min(LABOR.length - 1, Math.max(n, i)));
+      if (i >= LABOR.length - 1) window.clearInterval(timer);
+    }, 8000);
+
+    fetch(appDemoAuditUrl(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(lead),
+    })
+      .then(async (r) => {
+        const data = await r.json().catch(() => null);
+        if (!r.ok || !data?.audit) {
+          throw new Error(data?.error || "Không đọc được hồ sơ Google Maps.");
+        }
+        return data.audit as DemoAudit;
+      })
+      .then((live) => {
         window.clearInterval(timer);
+        setLaborIndex(LABOR.length);
+        setAudit(live);
         setDone(true);
-      }
-    }, 700);
+      })
+      .catch((err: Error) => {
+        window.clearInterval(timer);
+        setError(err.message || "Không chạy được audit thật. Thử lại link Maps.");
+        setStep(2);
+      });
   }
 
   const resultLayout = done && audit;
@@ -286,7 +295,7 @@ export function Diagnosis() {
               </h3>
               <div className="mt-6 space-y-6">
                 <div>
-                  <Label htmlFor="biz">Tên cửa hàng (nếu có)</Label>
+                  <Label htmlFor="biz">Tên cửa hàng trên Maps</Label>
                   <Input
                     id="biz"
                     className="mt-2"
@@ -298,7 +307,7 @@ export function Diagnosis() {
                 <div>
                   <Label htmlFor="maps">
                     Link Google Maps / Google Business{" "}
-                    <span className="font-normal text-muted">(nếu có)</span>
+                    <span className="font-normal text-muted">(nên có)</span>
                   </Label>
                   <Input
                     id="maps"
@@ -310,7 +319,7 @@ export function Diagnosis() {
                     autoComplete="url"
                   />
                   <p className="mt-1.5 text-xs text-muted">
-                    Có link giúp chẩn đoán đúng hồ sơ của bạn. Chưa có cũng làm tiếp được.
+                    Cần link hoặc đúng tên cửa hàng. Hệ thống đọc hồ sơ công khai — không tự chấm điểm.
                   </p>
                 </div>
                 <div>
@@ -414,9 +423,9 @@ export function Diagnosis() {
 
           {step === 3 && !done && (
             <div className="py-6">
-              <h3 className="font-display text-2xl tracking-tight">Đang xem hộ bạn</h3>
+              <h3 className="font-display text-2xl tracking-tight">Đang đọc hồ sơ Maps thật</h3>
               <p className="mt-2 text-sm text-muted">
-                Khoảng 15 giây — đang đối chiếu tình trạng bạn chọn với khung SEO Maps.
+                20–40 giây. Mở Google Maps công khai rồi chạy audit — không dùng số giả.
               </p>
               <ul className="mt-8 space-y-3">
                 {LABOR.map((line, i) => (
@@ -441,16 +450,13 @@ export function Diagnosis() {
           {done && audit && (
             <div className="lg:col-span-2">
               <p className="text-xs font-medium text-muted">
-                Kết quả trong Local Growth OS — chỉ mở phần đủ để quyết định
+                Dữ liệu lấy từ Google Maps công khai · audit chạy trên OS
               </p>
               <h3 className="mt-2 font-display text-2xl tracking-tight">
-                Đúng màn hình audit của sản phẩm. Chưa mở lộ trình và số liệu chu kỳ.
+                Kết quả thật — chỉ hiện phần đủ để quyết định.
               </h3>
               <p className="mt-2 text-sm text-muted">
-                {statusMeta?.note}{" "}
-                {form.mapsUrl
-                  ? "Link Maps đã ghi nhận — tin Zalo và bản OS sẽ bám đúng hồ sơ."
-                  : "Chưa có link Maps: điểm là ước lượng theo tình trạng bạn chọn."}
+                Điểm và việc làm dựa trên hồ sơ vừa đọc. Lộ trình 30 ngày và tín hiệu gọi / chỉ đường vẫn khóa.
               </p>
               <div className="mt-6">
                 <ProductAuditFrame

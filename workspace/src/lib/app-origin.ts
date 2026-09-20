@@ -27,3 +27,7 @@ export function appLoginUrl() {
 export function appLeadsUrl() {
   return new URL("/api/public/leads", APP_ORIGIN).toString();
 }
+
+export function appDemoAuditUrl() {
+  return new URL("/api/public/demo-audit", APP_ORIGIN).toString();
+}

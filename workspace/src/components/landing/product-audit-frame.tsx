@@ -86,13 +86,34 @@ export function ProductAuditFrame({
               <p className="mt-0.5 flex items-center gap-1 text-[12px] text-[#6b7c88]">
                 <MapPin className="size-3.5" />
                 {audit.industryLabel} · {audit.area}
-                {audit.mapsUrl ? " · đã gắn link Maps" : " · chưa có link Maps"}
+                {audit.source ? ` · nguồn ${audit.source}` : " · Maps công khai"}
               </p>
             </div>
             <span className="rounded-full bg-[#fff3dc] px-2 py-1 text-[10px] font-bold text-[#ab7513]">
               Độ khó khu vực: {audit.difficulty}
             </span>
           </div>
+
+          {audit.snapshot && (
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="rounded-lg border border-[#d7e0e8] bg-white px-3 py-2">
+                <p className="text-[10px] text-[#8a99a4]">Rating Maps</p>
+                <p className="text-[16px] font-extrabold">{audit.snapshot.rating ?? "—"}</p>
+              </div>
+              <div className="rounded-lg border border-[#d7e0e8] bg-white px-3 py-2">
+                <p className="text-[10px] text-[#8a99a4]">Số đánh giá</p>
+                <p className="text-[16px] font-extrabold">{audit.snapshot.review_count ?? "—"}</p>
+              </div>
+              <div className="rounded-lg border border-[#d7e0e8] bg-white px-3 py-2">
+                <p className="text-[10px] text-[#8a99a4]">Ảnh</p>
+                <p className="truncate text-[12px] font-semibold">{audit.snapshot.photos_signal || "—"}</p>
+              </div>
+              <div className="rounded-lg border border-[#d7e0e8] bg-white px-3 py-2">
+                <p className="text-[10px] text-[#8a99a4]">Bài đăng</p>
+                <p className="truncate text-[12px] font-semibold">{audit.snapshot.posts_signal || "—"}</p>
+              </div>
+            </div>
+          )}
 
           <div className="mt-4 grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)]">
             <div className="flex items-center gap-3 rounded-xl border border-[#d7e0e8] bg-white p-4">
