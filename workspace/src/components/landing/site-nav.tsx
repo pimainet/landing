@@ -1,5 +1,6 @@
 import { Logo } from "@/components/landing/logo";
 import { Button } from "@/components/ui/button";
+import { appLoginUrl } from "@/lib/app-origin";
 
 export function SiteNav() {
   return (
@@ -25,8 +26,8 @@ export function SiteNav() {
         </nav>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
-            <a href="https://maps.bgs.com.vn" target="_blank" rel="noreferrer">
-              Đăng nhập
+            <a href={appLoginUrl()} target="_blank" rel="noreferrer">
+              Đăng nhập OS
             </a>
           </Button>
           <Button size="sm" asChild>

@@ -1,10 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { buildDemoAudit, type DemoAudit } from "@/lib/demo-audit";
+import { appLeadsUrl } from "@/lib/app-origin";
+import { ProductAuditFrame } from "@/components/landing/product-audit-frame";
 
 const INDUSTRIES = [
   { id: "fnb", label: "Nhà hàng, quán ăn" },
@@ -97,11 +100,11 @@ export function Diagnosis() {
   const [laborIndex, setLaborIndex] = useState(0);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const [audit, setAudit] = useState<DemoAudit | null>(null);
 
   const progress = done ? 100 : step === 3 ? 88 : (step / 3) * 100;
   const industryLabel = INDUSTRIES.find((i) => i.id === form.industry)?.label;
   const statusMeta = STATUSES.find((s) => s.id === form.status);
-  const health = useMemo(() => scoreFor(form.status), [form.status]);
 
   useEffect(() => {
     if (step === 0 && !done) return;
@@ -144,10 +147,18 @@ export function Diagnosis() {
     }
     setStep(3);
     setLaborIndex(0);
+    const nextAudit = buildDemoAudit({
+      ...form,
+      phone,
+      industryLabel,
+    });
+    setAudit(nextAudit);
     const lead = {
       ...form,
       phone,
       at: new Date().toISOString(),
+      overall: nextAudit.overall,
+      source: "landing-demo",
     };
     try {
       const prev = JSON.parse(localStorage.getItem("lgos-leads") ?? "[]") as unknown[];
@@ -155,6 +166,18 @@ export function Diagnosis() {
     } catch {
       /* ignore quota */
     }
+    void fetch(appLeadsUrl(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(lead),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.audit) setAudit(data.audit);
+      })
+      .catch(() => {
+        /* OS chưa bật API công khai — dùng bản demo local */
+      });
 
     let i = 0;
     const timer = window.setInterval(() => {
@@ -167,9 +190,18 @@ export function Diagnosis() {
     }, 700);
   }
 
+  const resultLayout = done && audit;
+
   return (
     <section id="chan-doan" className="scroll-mt-24 border-t border-border py-20 md:py-28">
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
+      <div
+        className={
+          resultLayout
+            ? "mx-auto grid max-w-6xl gap-10 px-5"
+            : "mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16"
+        }
+      >
+        {!resultLayout && (
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-accent">
             Bắt đầu từ đây
@@ -195,11 +227,18 @@ export function Diagnosis() {
             ))}
           </ul>
         </div>
+        )}
 
         <div
           id="chan-doan-the"
-          className="scroll-mt-24 rounded-2xl bg-surface p-5 shadow-[var(--shadow-border)] md:p-8"
+          className={
+            resultLayout
+              ? "scroll-mt-24"
+              : "scroll-mt-24 rounded-2xl bg-surface p-5 shadow-[var(--shadow-border)] md:p-8"
+          }
         >
+          {!resultLayout && (
+            <>
           <div className="mb-6 flex items-center justify-between gap-4">
             <p className="text-xs font-medium text-muted">
               {done ? "Kết quả sơ bộ" : `Bước ${Math.min(step + 1, 3)} / 3`}
@@ -207,6 +246,8 @@ export function Diagnosis() {
             <span className="text-xs tabular-nums text-subtle">{Math.round(progress)}%</span>
           </div>
           <Progress value={progress} className="mb-8" />
+            </>
+          )}
 
           {step === 0 && (
             <div>
@@ -397,47 +438,42 @@ export function Diagnosis() {
             </div>
           )}
 
-          {done && (
-            <div>
-              <h3 className="font-display text-2xl tracking-tight">
-                Đã ghi nhận — đây là hướng sơ bộ
+          {done && audit && (
+            <div className="lg:col-span-2">
+              <p className="text-xs font-medium text-muted">
+                Kết quả trong Local Growth OS — chỉ mở phần đủ để quyết định
+              </p>
+              <h3 className="mt-2 font-display text-2xl tracking-tight">
+                Đúng màn hình audit của sản phẩm. Chưa mở lộ trình và số liệu chu kỳ.
               </h3>
               <p className="mt-2 text-sm text-muted">
-                Điểm dưới dựa trên tình trạng bạn chọn, chưa thay audit tay trên hồ sơ thật.
+                {statusMeta?.note}{" "}
                 {form.mapsUrl
-                  ? " Vì đã có link Maps, tin Zalo sẽ bám đúng hồ sơ hơn."
-                  : " Nếu bổ sung link Maps sau, chẩn đoán sẽ sát hơn."}
+                  ? "Link Maps đã ghi nhận — tin Zalo và bản OS sẽ bám đúng hồ sơ."
+                  : "Chưa có link Maps: điểm là ước lượng theo tình trạng bạn chọn."}
               </p>
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <div className="rounded-xl bg-bg p-4">
-                  <p className="text-xs text-muted">Mức ước lượng</p>
-                  <p className="mt-2 font-display text-4xl tabular-nums">{health}</p>
-                  <p className="mt-1 text-xs text-muted">/100 · chưa phải audit đầy đủ</p>
-                </div>
-                <div className="rounded-xl bg-bg p-4">
-                  <p className="text-xs text-muted">Đọc nhanh</p>
-                  <p className="mt-2 text-sm leading-relaxed">{statusMeta?.note}</p>
-                </div>
+              <div className="mt-6">
+                <ProductAuditFrame
+                  audit={audit}
+                  contactName={form.name}
+                  phone={normalizePhone(form.phone)}
+                />
               </div>
-              <div className="mt-5 rounded-xl border border-border bg-bg p-4">
-                <p className="text-xs font-medium text-muted">Bước tiếp theo (trong 24 giờ)</p>
-                <ol className="mt-3 list-decimal space-y-2 pl-4 text-sm leading-relaxed">
-                  <li>Tin Zalo vào số {normalizePhone(form.phone)} — 3 việc nên làm trước trên Maps</li>
-                  <li>Nếu bạn muốn, mình xem giúp link hồ sơ và nói rõ chỗ đang chặn gọi / chỉ đường</li>
-                  <li>Bạn tự làm, hoặc làm cùng gói SEO Maps — không ép</li>
-                </ol>
-              </div>
-              <p className="mt-4 text-sm leading-relaxed text-muted">
-                {industryLabel ? `${industryLabel} · ` : ""}
-                {form.city}
-                {form.business ? ` · ${form.business}` : ""}
-                {form.mapsUrl ? " · đã gắn link Maps" : ""}.
-              </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Button size="lg" asChild>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Button size="lg" variant="outline" asChild>
                   <a href="#faq">Xem câu hỏi thường gặp</a>
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => { setDone(false); setStep(0); setForm(EMPTY); setLaborIndex(0); }}>
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  onClick={() => {
+                    setDone(false);
+                    setStep(0);
+                    setForm(EMPTY);
+                    setLaborIndex(0);
+                    setAudit(null);
+                  }}
+                >
                   Làm lại cho cửa khác
                 </Button>
               </div>
