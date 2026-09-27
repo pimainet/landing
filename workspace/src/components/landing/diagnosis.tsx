@@ -1,13 +1,46 @@
-import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, LoaderCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  LoaderCircle,
+  MapPin,
+  PhoneCall,
+  Sparkles,
+  Trophy,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import type { DemoAudit } from "@/lib/demo-audit";
-import { appDemoAuditUrl } from "@/lib/app-origin";
+import { appDemoAuditUrl, appLeadsUrl } from "@/lib/app-origin";
 import { ProductAuditFrame } from "@/components/landing/product-audit-frame";
+
+function getNoProfileBenefits(industryLabel?: string) {
+  const industryPhrase = (industryLabel || "dịch vụ").toLowerCase();
+  return [
+    {
+      icon: MapPin,
+      text: `Hiện trên Google Maps khi khách gõ “${industryPhrase} gần tôi” — thứ bạn đang bị bỏ lỡ hoàn toàn.`,
+    },
+    {
+      icon: PhoneCall,
+      text: "Có ngay nút Gọi / Chỉ đường ngay trên kết quả tìm kiếm, không cần khách vào website.",
+    },
+    {
+      icon: Trophy,
+      text: "Đối thủ cùng khu vực gần như chắc chắn đã có hồ sơ — mỗi ngày chưa tạo là một ngày nhường khách.",
+    },
+    {
+      icon: Sparkles,
+      text: "Miễn phí, mất khoảng 10 phút — và là điều kiện bắt buộc để audit thật, chấm điểm mạnh/yếu sau này.",
+    },
+  ] as const;
+}
+
+const GOOGLE_BUSINESS_CREATE_URL = "https://business.google.com/create";
 
 const INDUSTRIES = [
   { id: "fnb", label: "Nhà hàng, quán ăn" },
@@ -33,30 +66,10 @@ const CITIES = [
 ] as const;
 
 const STATUSES = [
-  {
-    id: "none",
-    label: "Chưa có hồ sơ trên Google Maps",
-    score: 18,
-    note: "Google gần như chưa biết cửa hàng bạn trên bản đồ — khách tìm gần đây khó thấy bạn.",
-  },
-  {
-    id: "buried",
-    label: "Có hồ sơ nhưng ít ai gọi / chỉ đường",
-    score: 34,
-    note: "Hồ sơ đã có, nhưng khách vẫn đang bấm chỗ khác trước. Cần xem chỗ nào đang chặn tín hiệu.",
-  },
-  {
-    id: "unstable",
-    label: "Có lúc lên, có lúc tụt — không giữ được",
-    score: 58,
-    note: "Nền đã có. Cần hướng rõ và theo dõi tín hiệu, không chỉ đăng thêm cho có.",
-  },
-  {
-    id: "unknown",
-    label: "Không rõ đang đứng ở đâu trên Maps",
-    score: 28,
-    note: "Chưa xem hiện trạng thì khó biết việc nào đáng làm trước.",
-  },
+  { id: "none", label: "Chưa có hồ sơ trên Google Maps" },
+  { id: "buried", label: "Có hồ sơ nhưng ít ai gọi / chỉ đường" },
+  { id: "unstable", label: "Có lúc lên, có lúc tụt — không giữ được" },
+  { id: "unknown", label: "Không rõ đang đứng ở đâu trên Maps" },
 ] as const;
 
 const LABOR = [
@@ -86,10 +99,6 @@ const EMPTY: FormState = {
   phone: "",
 };
 
-function scoreFor(status: string) {
-  return STATUSES.find((s) => s.id === status)?.score ?? 30;
-}
-
 function normalizePhone(raw: string) {
   return raw.replace(/[\s.\-()]/g, "");
 }
@@ -101,10 +110,20 @@ export function Diagnosis() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   const [audit, setAudit] = useState<DemoAudit | null>(null);
+  const [noProfile, setNoProfile] = useState(false);
+  const timersRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach((id) => {
+        window.clearTimeout(id);
+        window.clearInterval(id);
+      });
+    };
+  }, []);
 
   const progress = done ? 100 : step === 3 ? 88 : (step / 3) * 100;
   const industryLabel = INDUSTRIES.find((i) => i.id === form.industry)?.label;
-  const statusMeta = STATUSES.find((s) => s.id === form.status);
 
   useEffect(() => {
     if (step === 0 && !done) return;
@@ -153,6 +172,7 @@ export function Diagnosis() {
     setLaborIndex(0);
     setDone(false);
     setAudit(null);
+    setNoProfile(false);
     const lead = {
       ...form,
       phone,
@@ -167,12 +187,31 @@ export function Diagnosis() {
       /* ignore quota */
     }
 
+    // Chưa có hồ sơ Google Maps thì không có gì để audit — không gọi API đọc dữ liệu thật.
+    // Thay vào đó, ghi nhận lead riêng để tư vấn tạo hồ sơ, rồi hiện bảng CTA lợi ích.
+    if (form.status === "none") {
+      fetch(appLeadsUrl(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...lead, reason: "no-gmb-profile" }),
+      }).catch(() => {
+        /* lead vẫn đã lưu localStorage, không chặn UI vì lỗi mạng */
+      });
+      const t = window.setTimeout(() => {
+        setNoProfile(true);
+        setDone(true);
+      }, 900);
+      timersRef.current.push(t);
+      return;
+    }
+
     let i = 0;
     const timer = window.setInterval(() => {
       i += 1;
       setLaborIndex((n) => Math.min(LABOR.length - 1, Math.max(n, i)));
       if (i >= LABOR.length - 1) window.clearInterval(timer);
     }, 8000);
+    timersRef.current.push(timer);
 
     fetch(appDemoAuditUrl(), {
       method: "POST",
@@ -199,7 +238,7 @@ export function Diagnosis() {
       });
   }
 
-  const resultLayout = done && audit;
+  const resultLayout = done && (audit || noProfile);
 
   return (
     <section id="chan-doan" className="scroll-mt-24 border-t border-border py-20 md:py-28">
@@ -421,7 +460,21 @@ export function Diagnosis() {
             </div>
           )}
 
-          {step === 3 && !done && (
+          {step === 3 && !done && form.status === "none" && (
+            <div className="py-6">
+              <h3 className="font-display text-2xl tracking-tight">Đang ghi nhận thông tin</h3>
+              <p className="mt-2 text-sm text-muted">
+                Bạn chưa có hồ sơ trên Google Maps nên chưa có gì để audit — chúng tôi chuẩn bị
+                bước tạo hồ sơ cho bạn.
+              </p>
+              <div className="mt-8 flex items-center gap-3 text-sm text-fg">
+                <LoaderCircle className="size-4 animate-spin text-accent" />
+                Đang chuẩn bị bảng hướng dẫn…
+              </div>
+            </div>
+          )}
+
+          {step === 3 && !done && form.status !== "none" && (
             <div className="py-6">
               <h3 className="font-display text-2xl tracking-tight">Đang đọc hồ sơ Maps thật</h3>
               <p className="mt-2 text-sm text-muted">
@@ -443,6 +496,62 @@ export function Diagnosis() {
               </ul>
               <div className="relative mt-8 h-1.5 overflow-hidden rounded-full bg-surface-2">
                 <div className="labor-bar relative h-full w-1/2 bg-accent" />
+              </div>
+            </div>
+          )}
+
+          {done && noProfile && (
+            <div className="lg:col-span-2">
+              <p className="text-xs font-medium text-muted">
+                Chưa có hồ sơ Google Maps · chưa có gì để audit
+              </p>
+              <h3 className="mt-2 font-display text-2xl tracking-tight">
+                Việc cần làm trước tiên: tạo hồ sơ Google Business.
+              </h3>
+              <p className="mt-2 max-w-2xl text-sm text-muted">
+                Audit đọc điểm, đánh giá, ảnh, bài đăng… trên một hồ sơ đã tồn tại. Bạn chưa có
+                hồ sơ nào nên chưa có dữ liệu để chấm mạnh/yếu — tạo hồ sơ trước là bước đúng thứ
+                tự, sau đó quay lại đây để audit thật.
+              </p>
+              <div className="mt-6 grid gap-3 rounded-2xl border border-border bg-surface-2 p-5 sm:grid-cols-2">
+                {getNoProfileBenefits(industryLabel).map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-start gap-3">
+                    <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-accent/10 text-accent">
+                      <Icon className="size-4" />
+                    </span>
+                    <p className="text-sm leading-relaxed text-fg">{text}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Button size="lg" asChild>
+                  <a href={GOOGLE_BUSINESS_CREATE_URL} target="_blank" rel="noopener noreferrer">
+                    Tạo hồ sơ Google Business <ArrowRight className="size-4" />
+                  </a>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <a href="#faq">Xem câu hỏi thường gặp</a>
+                </Button>
+              </div>
+              <p className="mt-4 text-xs text-muted">
+                Tạo xong (kể cả chưa xác minh), quay lại và chọn tình trạng khác — chúng tôi sẽ
+                audit thật trên đúng hồ sơ vừa tạo. Đội ngũ cũng sẽ nhắn Zalo hỗ trợ bạn từng bước
+                trong 24 giờ.
+              </p>
+              <div className="mt-4">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setDone(false);
+                    setStep(0);
+                    setForm(EMPTY);
+                    setLaborIndex(0);
+                    setAudit(null);
+                    setNoProfile(false);
+                  }}
+                >
+                  Làm lại cho cửa khác
+                </Button>
               </div>
             </div>
           )}
@@ -478,6 +587,7 @@ export function Diagnosis() {
                     setForm(EMPTY);
                     setLaborIndex(0);
                     setAudit(null);
+                    setNoProfile(false);
                   }}
                 >
                   Làm lại cho cửa khác
